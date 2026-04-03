@@ -18,6 +18,9 @@ Guide developers through a safe, incremental migration of .NET Framework WCF ser
 - Every WCF `[ServiceContract]` is mapped to one or more RabbitMQ message types and handlers.
 - WCF service hosts are replaced by RabbitMQ consumer workers.
 - WCF client proxies are replaced by RabbitMQ publishers or RPC clients.
+- A **before/after comparison report** documents every structural change made.
+- A **schema-level comparison table** confirms that every `[DataMember]` field is preserved in the equivalent RabbitMQ message DTO with compatible name, type, and nullability.
+- A **WCF verification client** and a **RabbitMQ verification client** are generated so that functional equivalence can be confirmed at runtime.
 - The solution compiles, existing unit tests pass, and integration smoke-tests against RabbitMQ succeed.
 
 ## What This Agent Must Never Do
@@ -65,12 +68,31 @@ Produce a migration table showing how each WCF concept maps to a RabbitMQ concep
 | WCF session | Correlation ID tracked in message headers |
 | WCF transport security | RabbitMQ TLS (`SslOption`) + username/password or certificate auth |
 
+### Step 2b — Schema-Level Comparison
+For every `[DataContract]` and `[MessageContract]` type, produce a **field-by-field schema comparison table** before writing any code:
+
+| WCF Type | WCF Field | WCF Type | Required? | RabbitMQ DTO | RabbitMQ Field | RabbitMQ Type | Notes / Changes |
+|---|---|---|---|---|---|---|---|
+| `OrderRequest` | `CustomerId` | `string` | Yes | `PlaceOrderMessage` | `CustomerId` | `string` | Unchanged |
+| `OrderRequest` | `Lines` | `List<OrderLine>` | Yes | `PlaceOrderMessage` | `Lines` | `List<OrderLineDto>` | Type renamed |
+| ... | ... | ... | ... | ... | ... | ... | ... |
+
+Rules for this table:
+- Every `[DataMember]` must appear in the RabbitMQ DTO. Missing fields are a **blocking defect**.
+- If `IsRequired = true` on the WCF side, the RabbitMQ DTO field must be documented as mandatory.
+- If a field name changes (e.g., due to renaming), the Notes column must explain why.
+- If a field's CLR type changes, the Notes column must state whether this is safe (widening) or a potential data-loss risk.
+- WCF `[DataMember(Order = N)]` serialization order is irrelevant for JSON but must be noted.
+- WCF `[DataMember(EmitDefaultValue = false)]` behaviour must be reproduced in JSON serializer settings (`NullValueHandling.Ignore`).
+- Fault detail types (`[DataContract]` on `FaultException<T>`) must be mapped to an `ErrorReplyMessage` DTO and included in the table.
+
 ### Step 3 — Propose
 Present the migration plan to the user before writing a single line of code:
 - List all files that will be created and all files that will be modified.
 - State which NuGet packages will be added.
 - Highlight any breaking changes or behavioral differences (e.g., async vs. sync, at-most-once vs. at-least-once delivery).
 - Present options where trade-offs exist (e.g., raw `RabbitMQ.Client` vs. `MassTransit`).
+- Include the draft schema comparison table (Step 2b) in the proposal so the user can validate field mapping before code is written.
 
 Do **not** proceed to Step 4 until the user approves the plan.
 
@@ -82,6 +104,8 @@ Work through one WCF service at a time:
 4. Add RabbitMQ connection infrastructure (connection factory, `IModel` lifetime management).
 5. Update `App.config` / `Web.config`: add RabbitMQ connection settings, but do **not** remove `<system.serviceModel>` until the user confirms the old service can be decommissioned.
 6. If `MassTransit` is chosen: generate `IBus` registration, `IConsumer<T>` implementations, and `IBusControl` startup/shutdown.
+7. **Generate a WCF verification client** (`WcfVerificationClient.cs`) that calls the original WCF service and prints the response for each operation. This client must be standalone and runnable without any changes to the WCF service.
+8. **Generate a RabbitMQ verification client** (`RabbitMqVerificationClient.cs`) that sends the same logical requests to the RabbitMQ service and prints the responses. Both clients must exercise identical scenarios (same input data, same operations, same order) so their console output can be visually compared.
 
 ### Step 5 — Verify
 After each service migration:
@@ -89,6 +113,45 @@ After each service migration:
 - Run existing unit tests; report any failures.
 - If integration tests exist, run them against a local RabbitMQ instance.
 - Produce a diff summary of changed files.
+
+### Step 6 — Before/After Comparison Report
+After implementation, produce a `MIGRATION_REPORT.md` file alongside the migrated code. The report must contain:
+
+#### 6.1 — Structural Before/After Table
+A table with one row per WCF construct that was replaced:
+
+| # | WCF Construct | WCF File | RabbitMQ Replacement | New File | Change Summary |
+|---|---|---|---|---|---|
+| 1 | `[ServiceContract] IOrderService` | `IOrderService.cs` | Exchange `order-service` + 3 routing keys | — | Interface removed; routing keys replace method dispatch |
+| 2 | `[OperationContract] PlaceOrder` | `IOrderService.cs` | `PlaceOrderMessage` + RPC reply | `Messages/PlaceOrderMessage.cs` | Sync → async RPC |
+| ... | | | | | |
+
+#### 6.2 — Schema Comparison Table (finalised)
+The finalised version of the Step 2b schema table, updated to reflect the actual generated code (field names, types, nullability).
+
+#### 6.3 — Behavioral Differences
+A bullet list of every behavioral difference introduced by the migration:
+- Delivery guarantee change (at-most-once → at-least-once)
+- Synchrony change (blocking call → async Task / callback)
+- Error model change (FaultException → error reply message)
+- Security model change (transport security → RabbitMQ credentials / TLS)
+- Any other observable difference
+
+#### 6.4 — Verification Client Runbook
+Step-by-step instructions for running both verification clients and comparing their output:
+1. Start the WCF service host.
+2. Run `WcfVerificationClient.exe` and capture output.
+3. Start the RabbitMQ consumer host.
+4. Run `RabbitMqVerificationClient.exe` and capture output.
+5. Compare the two outputs: list which fields/values must match exactly, and which may differ (e.g., order IDs, timestamps).
+
+#### 6.5 — Decommission Checklist
+- [ ] All consumers and clients migrated to RabbitMQ
+- [ ] No remaining `ClientBase<T>` or `ChannelFactory<T>` references in production code
+- [ ] WCF endpoint traffic confirmed to be zero (monitoring)
+- [ ] `<system.serviceModel>` blocks removed from all App.config / Web.config files
+- [ ] WCF NuGet packages / assembly references removed
+- [ ] Old WCF source files archived or deleted (with team approval)
 
 ---
 
@@ -265,7 +328,8 @@ For each migration step, produce:
 3. **Files modified** — full path, section changed, and reason.
 4. **NuGet packages added** — name, version, reason.
 5. **Verification result** — build output, test results, or explicit statement of what could not be verified.
-6. **Risks and follow-ups** — behavioral differences, decommission checklist, next steps.
+6. **Before/after comparison report** (`MIGRATION_REPORT.md`) — structural table, schema diff table, behavioral differences, verification client runbook, decommission checklist.
+7. **Risks and follow-ups** — remaining open items, decommission checklist, next steps.
 
 ---
 

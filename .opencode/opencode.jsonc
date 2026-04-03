@@ -41,7 +41,7 @@
       }
     },
     "wcf-to-rabbitmq-migration": {
-      "description": "Specialized agent for migrating .NET Framework WCF services to RabbitMQ-based messaging. Analyzes WCF contracts, bindings, and endpoints, then generates equivalent RabbitMQ producers, consumers, and message DTOs with a safe, step-by-step workflow.",
+      "description": "Top-level entry point for WCF-to-RabbitMQ migration. Delegates to the wcf-migration-orchestrator which drives the full four-phase workflow (Explorer → Planner → Executor → Verifier).",
       "mode": "primary",
       "model": "REPLACE_WITH_MODEL",
       "prompt": "{file:./agents/wcf-to-rabbitmq-migration.md}",
@@ -52,6 +52,72 @@
       },
       "permission": {
         "edit": "ask",
+        "bash": "ask"
+      }
+    },
+    "wcf-migration-orchestrator": {
+      "description": "Orchestrator for WCF-to-RabbitMQ migration. Drives Explorer → Planner → Executor → Verifier in strict sequence, enforces approval gates, handles escalations, and delivers the final migration summary.",
+      "mode": "primary",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/wcf-migration-orchestrator.md}",
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": true
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      }
+    },
+    "wcf-migration-explorer": {
+      "description": "Read-only WCF inventory sub-agent. Scans a .NET Framework WCF solution and emits EXPLORER_REPORT.md listing all service contracts, data contracts, bindings, behaviors, and client proxies.",
+      "mode": "subagent",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/wcf-migration-explorer.md}",
+      "tools": {
+        "write": true,
+        "edit": false,
+        "bash": false
+      }
+    },
+    "wcf-migration-planner": {
+      "description": "Planning sub-agent for WCF-to-RabbitMQ migration. Reads EXPLORER_REPORT.md and produces MIGRATION_PLAN.md with concept mapping, field-by-field schema comparison, file manifest, and behavioral differences. No code generation.",
+      "mode": "subagent",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/wcf-migration-planner.md}",
+      "tools": {
+        "write": true,
+        "edit": false,
+        "bash": false
+      }
+    },
+    "wcf-migration-executor": {
+      "description": "Code-generation sub-agent for WCF-to-RabbitMQ migration. Reads approved MIGRATION_PLAN.md and generates all RabbitMQ message DTOs, consumer workers, publisher clients, verification clients, and infrastructure. Never modifies WCF files.",
+      "mode": "subagent",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/wcf-migration-executor.md}",
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": true
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      }
+    },
+    "wcf-migration-verifier": {
+      "description": "Verification sub-agent for WCF-to-RabbitMQ migration. Validates generated code against the approved plan, runs build and tests, checks schema completeness and verification client structure, and produces VERIFICATION_REPORT.md and MIGRATION_REPORT.md.",
+      "mode": "subagent",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/wcf-migration-verifier.md}",
+      "tools": {
+        "write": true,
+        "edit": false,
+        "bash": true
+      },
+      "permission": {
         "bash": "ask"
       }
     }

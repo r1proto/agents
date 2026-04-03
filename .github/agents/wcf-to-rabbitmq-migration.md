@@ -109,8 +109,8 @@ public class PlaceOrderMessage
 ```csharp
 public class OrderServiceConsumer : IDisposable
 {
-    private readonly IConnection _connection;
-    private readonly IModel _channel;
+    private IConnection _connection;
+    private IModel _channel;
 
     public OrderServiceConsumer(IConnectionFactory factory)
     {
@@ -133,11 +133,31 @@ public class OrderServiceConsumer : IDisposable
         }
         catch (Exception ex)
         {
+            // Log ex using your application's logging infrastructure before nacking
             _channel.BasicNack(e.DeliveryTag, multiple: false, requeue: false);
         }
     }
 
-    public void Dispose() { _channel?.Dispose(); _connection?.Dispose(); }
+    private bool _disposed;
+
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        if (disposing)
+        {
+            _channel?.Dispose();
+            _channel = null;
+            _connection?.Dispose();
+            _connection = null;
+        }
+        _disposed = true;
+    }
 }
 ```
 

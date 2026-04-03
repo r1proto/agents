@@ -71,7 +71,7 @@ After each service:
 | Package | Version | Purpose |
 |---|---|---|
 | `RabbitMQ.Client` | 6.x | Core connectivity (.NET Framework 4.6.1+) |
-| `Newtonsoft.Json` | latest stable | DTO serialization |
+| `Newtonsoft.Json` | 13.0.1 or later | DTO serialization |
 | `MassTransit` + `MassTransit.RabbitMQ` | optional | Higher-level abstraction |
 | `Topshelf` | optional | Windows Service host |
 

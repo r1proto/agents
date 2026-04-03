@@ -1,0 +1,44 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "//": "This file is a production-grade template for an OpenCode agent pack. Customize models, tools, permissions, and prompts before production use.",
+  "default_agent": "plan",
+  "agent": {
+    "plan": {
+      "description": "Template planning agent for analyzing requests and proposing safe implementation plans.",
+      "mode": "primary",
+      "model": "REPLACE_WITH_MODEL",
+      "temperature": 0.1,
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
+    },
+    "build-specialist": {
+      "description": "Template build agent for safe, minimal, verified code changes.",
+      "mode": "primary",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./prompts/build-specialist.txt}",
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": true
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      }
+    },
+    "reviewer": {
+      "description": "Template review subagent for correctness, maintainability, and safety review.",
+      "mode": "subagent",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/reviewer.md}",
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
+    }
+  }
+}

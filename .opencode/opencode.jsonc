@@ -39,6 +39,21 @@
         "edit": false,
         "bash": false
       }
+    },
+    "wcf-to-rabbitmq-migration": {
+      "description": "Specialized agent for migrating .NET Framework WCF services to RabbitMQ-based messaging. Analyzes WCF contracts, bindings, and endpoints, then generates equivalent RabbitMQ producers, consumers, and message DTOs with a safe, step-by-step workflow.",
+      "mode": "primary",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/wcf-to-rabbitmq-migration.md}",
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": true
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      }
     }
   }
 }

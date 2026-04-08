@@ -7,7 +7,11 @@ permission:
   grep: allow
   list: allow
   edit: deny
-  bash: deny
+  bash:
+    "*": deny
+    "git status*": allow
+    "git diff*": allow
+    "git log*": allow
   task:
     "*": deny
     wcf-migration-*: allow

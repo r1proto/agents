@@ -7,7 +7,19 @@ permission:
   grep: allow
   list: allow
   edit: allow
-  bash: ask
+  bash:
+    "*": ask
+    "git status*": allow
+    "git diff*": allow
+    "git log*": allow
+    "git show*": allow
+    "git commit*": deny
+    "git push*": deny
+    "git reset*": deny
+    "msbuild*": allow
+    "dotnet build*": allow
+    "dotnet test*": allow
+    "vstest.console*": allow
   task: deny
 ---
 

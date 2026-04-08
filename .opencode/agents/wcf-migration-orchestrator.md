@@ -14,7 +14,7 @@ permission:
     "git log*": allow
   task:
     "*": deny
-    wcf-migration-*: allow
+    "wcf-migration-*": allow
 ---
 
 # WCF Migration Orchestrator

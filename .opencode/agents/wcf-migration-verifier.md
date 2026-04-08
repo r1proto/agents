@@ -1,3 +1,16 @@
+---
+description: Verification sub-agent for WCF-to-RabbitMQ migration. Validates generated code against the approved plan, runs build and tests, checks schema completeness and verification client structure, and produces VERIFICATION_REPORT.md and MIGRATION_REPORT.md.
+mode: subagent
+permission:
+  read: allow
+  glob: allow
+  grep: allow
+  list: allow
+  edit: allow
+  bash: ask
+  task: deny
+---
+
 # WCF Migration Verifier (sub-agent)
 
 ## Role

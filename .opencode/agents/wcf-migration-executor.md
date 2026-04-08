@@ -1,3 +1,16 @@
+---
+description: Code-generation sub-agent for WCF-to-RabbitMQ migration. Reads approved MIGRATION_PLAN.md and generates all RabbitMQ message DTOs, consumer workers, publisher clients, verification clients, and infrastructure. Never modifies WCF files.
+mode: subagent
+permission:
+  read: allow
+  glob: allow
+  grep: allow
+  list: allow
+  edit: allow
+  bash: deny
+  task: deny
+---
+
 # WCF Migration Executor (sub-agent)
 
 ## Role

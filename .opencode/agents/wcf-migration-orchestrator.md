@@ -1,3 +1,18 @@
+---
+description: Orchestrator for WCF-to-RabbitMQ migration. Drives Explorer → Planner → Executor → Verifier in strict sequence, enforces approval gates, handles escalations, and delivers the final migration summary.
+mode: primary
+permission:
+  read: allow
+  glob: allow
+  grep: allow
+  list: allow
+  edit: deny
+  bash: deny
+  task:
+    "*": deny
+    wcf-migration-*: allow
+---
+
 # WCF Migration Orchestrator
 
 ## Role

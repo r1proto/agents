@@ -1,3 +1,16 @@
+---
+description: Read-only WCF inventory sub-agent. Scans a .NET Framework WCF solution and emits EXPLORER_REPORT.md listing all service contracts, data contracts, bindings, behaviors, and client proxies.
+mode: subagent
+permission:
+  read: allow
+  glob: allow
+  grep: allow
+  list: allow
+  edit: allow
+  bash: deny
+  task: deny
+---
+
 # WCF Migration Explorer (sub-agent)
 
 ## Role

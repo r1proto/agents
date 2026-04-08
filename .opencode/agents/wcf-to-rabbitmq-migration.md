@@ -1,3 +1,16 @@
+---
+description: Top-level entry point for WCF-to-RabbitMQ migration. Delegates to the wcf-migration-orchestrator which drives the full four-phase workflow (Explorer → Planner → Executor → Verifier).
+mode: primary
+permission:
+  read: allow
+  glob: allow
+  grep: allow
+  list: allow
+  edit: ask
+  bash: ask
+  task: allow
+---
+
 # WCF-to-RabbitMQ Migration Agent
 
 ## Role

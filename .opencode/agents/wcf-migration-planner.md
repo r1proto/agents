@@ -1,3 +1,16 @@
+---
+description: Planning sub-agent for WCF-to-RabbitMQ migration. Reads EXPLORER_REPORT.md and produces MIGRATION_PLAN.md with concept mapping, field-by-field schema comparison, file manifest, and behavioral differences. No code generation.
+mode: subagent
+permission:
+  read: allow
+  glob: allow
+  grep: allow
+  list: allow
+  edit: allow
+  bash: deny
+  task: deny
+---
+
 # WCF Migration Planner (sub-agent)
 
 ## Role

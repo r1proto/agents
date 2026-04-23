@@ -115,7 +115,19 @@ If a linter or formatter is configured (e.g., `dotnet format`, Resharper CLI), r
 
 Report the exact output of each command.
 
-### 5. Summarise
+### 5. Review
+
+After all verification checks pass, submit the following to the **reviewer** subagent:
+- The approved implementation plan from Step 2.
+- The list of files changed and the purpose of each change.
+- The verification results from Step 4.
+
+Then:
+- If the reviewer returns **Block**: fix all required items, re-verify, and re-submit for review.
+- If the reviewer returns **Concerns**: address or explicitly acknowledge each concern before proceeding.
+- If the reviewer returns **Approve**: proceed to Step 6.
+
+### 6. Summarise
 
 Return:
 
@@ -129,6 +141,10 @@ Return:
 - Build: [pass | fail — <error summary>]
 - Tests: [pass (N passed, 0 failed) | fail — <failure summary>]
 - Lint: [pass | fail | not configured]
+
+### Review
+- Verdict: [Approve | Concerns | Block]
+- Unresolved concerns (if any): ...
 
 ### Risks / Follow-ups
 - <Any remaining risk, deferred item, or recommendation>

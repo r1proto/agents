@@ -31,6 +31,42 @@ Always match the messaging library, DI patterns, and test framework already in u
 
 ---
 
+## Behavioral Guidelines
+
+These rules apply at every step of implementation. They are derived from the [Karpathy guidelines](https://github.com/r1proto/andrej-karpathy-skills/blob/main/skills/karpathy-guidelines/SKILL.md) (also available in this repo's agent skill pack) and take precedence when there is any doubt.
+
+### 1. Think Before Coding
+Before writing a single line:
+- State your assumptions explicitly. If uncertain, ask — do not guess silently.
+- If multiple valid interpretations of the spec exist, present them and wait for a choice.
+- If a simpler approach exists than what the spec implies, say so and propose it.
+- If anything is unclear, name exactly what is confusing and stop until resolved.
+
+### 2. Simplicity First
+- Write the minimum code that satisfies the spec. Nothing speculative.
+- No abstractions for single-use code.
+- No "future-proof" configurability that the spec did not request.
+- No error handling for scenarios the spec declares out of scope.
+- If your draft is 200 lines and could be 50, rewrite it before submitting.
+
+### 3. Surgical Changes
+- Touch only the files and lines required by the approved plan.
+- Do not improve adjacent code, comments, or formatting that you did not introduce.
+- Do not refactor code that is not broken.
+- Match the existing style of every file you edit, even if you would do it differently.
+- If you notice unrelated dead code, mention it in the summary — do not delete it.
+- Remove only imports/variables/functions that YOUR changes made unused.
+
+### 4. Goal-Driven Execution
+Transform every plan step into a verifiable goal:
+- "Add handler" → "Handler processes valid message and publishes expected event — confirmed by test"
+- "Add migration" → "Migration applies cleanly — confirmed by `dotnet ef database update` (dry run)"
+- "Fix failing test" → "Test passes — confirmed by `dotnet test --filter <TestName>`"
+
+Every plan step must have an explicit verify check (see plan template below).
+
+---
+
 ## Implementation Workflow
 
 ### 1. Inspect Before Implementing
@@ -48,22 +84,29 @@ Present the following plan and wait for approval:
 
 ### Entities / Data Model
 - [ ] <Entity name>: <description of fields, relationships, constraints>
+      → verify: `dotnet build` succeeds after entity class is added
 - [ ] EFCore migration: <migration name>
+      → verify: `dotnet ef migrations add <MigrationName>` succeeds and generated migration file looks correct
 
 ### Message Contracts
 - [ ] <Message type>: <fields, types, validation rules>
+      → verify: compiles without errors
 
 ### Handler(s)
 - [ ] <Handler class name>: <purpose, consumed message type, produced events/responses>
+      → verify: happy-path test passes
 
 ### Services / Repositories
 - [ ] <Class name>: <purpose>
+      → verify: unit tests pass
 
 ### DI Registration
 - [ ] <What to add in Program.cs / Startup.cs>
+      → verify: `dotnet build` succeeds
 
 ### Tests
 - [ ] <Test class>: happy path, invalid message, duplicate message
+      → verify: `dotnet test` — 0 failures
 ```
 
 Do not proceed to implementation until the plan is approved.

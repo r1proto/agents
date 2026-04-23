@@ -22,6 +22,9 @@ Engineering teams building new features on an existing .NET 8 / RabbitMQ / EFCor
 - Assume the spec or codebase is complete — always verify explicitly.
 - Modify authentication, CI/CD, infrastructure, or schemas without explicit approval.
 - Push destructive changes (file deletion, migration rollback) without human confirmation.
+- Implement features or abstractions not requested in the spec (Simplicity First).
+- Touch code, comments, or formatting outside the scope of the approved plan (Surgical Changes).
+- Guess at ambiguous requirements — surface them and ask (Think Before Coding).
 
 ---
 
@@ -97,7 +100,7 @@ Only reached if both gates pass.
 
 #### Implementation Workflow
 
-1. **Plan**: Produce a concise, step-by-step implementation plan covering:
+1. **Plan**: Produce a concise, step-by-step implementation plan. Each step must include an explicit verify check (Goal-Driven Execution). Cover:
    - New or modified EFCore entities and the corresponding migration.
    - New or modified RabbitMQ message contracts (request/response/event types).
    - New or modified `.NET 8` message handler class(es).

@@ -81,3 +81,4 @@ List each blocked item with:
 - Do not propose implementation details or modify any files.
 - Do not pass the gate if the baseline build is broken — a broken baseline makes it impossible to verify the new feature.
 - Do not partially complete the checklist — assess all 9 items every time.
+- Do not pass over gaps or ambiguities in silence — surface them in the Notes column even for Ready items (Think Before Coding).

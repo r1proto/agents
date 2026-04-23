@@ -75,3 +75,4 @@ List each missing or critically ambiguous item with a concrete description of wh
 - Do not propose implementation details or code.
 - Do not pass a spec that has critical ambiguity just to keep the workflow moving.
 - Do not partially complete the checklist — assess all 9 items every time.
+- Do not pass over ambiguity in silence — surface it explicitly in the Notes column even when marking an item Present (Think Before Coding).

@@ -36,6 +36,7 @@ The receiver must be stateless — it should not persist any state itself.
 - [ ] A POST with a malformed JSON body returns `400 Bad Request`.
 - [ ] A POST with an unsupported event type (e.g. `Push Hook`) returns `200 OK` and is silently
       ignored (no dispatcher call).
-- [ ] Tests exist for: valid signature, invalid signature, malformed JSON, unsupported event type.
+- [ ] Tests exist for: valid token, invalid or missing token, malformed JSON, unsupported event
+      type.
 - [ ] The receiver follows the existing HTTP routing/controller patterns in the repository.
 - [ ] The receiver is stateless; it holds no mutable state between requests.

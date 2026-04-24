@@ -29,11 +29,17 @@ Wiring steps:
 3. Wire the receiver's output into the event model parser (issue #2).
 4. Wire the parser's output into the dispatcher (issue #3).
 5. Wire the dispatcher's task payload output into the existing agent submission path.
+
+Clarification: In the diagram the wavy connector labeled "???" represents the existing agent submission path. Do not introduce a new agent execution or submission mechanism. The dispatcher MUST call the repository's canonical agent submission path (in-process call or the established submission service). The three handwritten options shown in the diagram ("1 - manual mode", "2 - Agent Client Protocol", "3 - opencode SDK") are alternative approaches considered during design; they are NOT the accepted implementation. Prefer reusing the existing agent submission path. Also correct the diagram label to read "Agent submission path (existing)" and fix the spelling "Protocol" in diagram annotations where applicable.
 6. Ensure errors at each step propagate and are returned with the appropriate HTTP status
    (400 for parse errors, 401 for auth failures, 500 for internal/dispatch failures).
 7. Add structured logging at each stage: webhook received, event parsed, dispatched, submitted.
 
 Add end-to-end or integration tests that:
+
+Image: `diagram-corrected.svg` — updated to label the agent submission path explicitly and move design alternatives into an informational callout. See docs/gitlab-webhook-integration/diagram-corrected.svg
+
+
 - Send a realistic GitLab issue webhook payload to the HTTP endpoint.
 - Assert that the agent submission path is called with the expected task payload.
 - Cover the error paths: invalid token, malformed payload, dispatcher failure.

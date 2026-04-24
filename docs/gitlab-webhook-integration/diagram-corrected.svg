@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="360" viewBox="0 0 900 360">
+  <style>
+    .box { fill:#f6f8fa; stroke:#333; stroke-width:1.5 }
+    .label { font: 14px/1.2 "Segoe UI", Roboto, "Helvetica Neue", Arial; fill:#111 }
+    .small { font: 12px; fill:#333 }
+    .note { font:12px; fill:#b30000 }
+    .arrow { stroke:#333; stroke-width:1.4; fill:none; marker-end:url(#arrowhead) }
+  </style>
+  <defs>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#333" />
+    </marker>
+  </defs>
+
+  <!-- Nodes -->
+  <rect x="20" y="40" width="160" height="50" class="box" rx="6"/>
+  <text x="100" y="70" text-anchor="middle" class="label">GitLab issue webhook POST</text>
+
+  <rect x="220" y="40" width="170" height="50" class="box" rx="6"/>
+  <text x="305" y="70" text-anchor="middle" class="label">Webhook Receiver</text>
+
+  <rect x="420" y="40" width="200" height="50" class="box" rx="6"/>
+  <text x="520" y="70" text-anchor="middle" class="label">GitLabIssueEvent parser/validator</text>
+
+  <rect x="220" y="140" width="200" height="50" class="box" rx="6"/>
+  <text x="320" y="170" text-anchor="middle" class="label">Dispatcher Service</text>
+
+  <rect x="460" y="140" width="180" height="50" class="box" rx="6"/>
+  <text x="550" y="170" text-anchor="middle" class="label">Internal Task Schema</text>
+
+  <rect x="700" y="140" width="160" height="50" class="box" rx="6"/>
+  <text x="780" y="170" text-anchor="middle" class="label">Agent Submission Path</text>
+  <text x="780" y="188" text-anchor="middle" class="small">(existing — reuse)</text>
+
+  <rect x="700" y="40" width="160" height="50" class="box" rx="6"/>
+  <text x="780" y="70" text-anchor="middle" class="label">Opencode Agent</text>
+
+  <!-- Arrows -->
+  <path d="M180 65 L220 65" class="arrow" />
+  <path d="M390 65 L420 65" class="arrow" />
+  <path d="M520 95 L520 140" class="arrow" />
+  <path d="M420 165 L460 165" class="arrow" />
+  <path d="M640 165 L700 165" class="arrow" />
+  <path d="M780 190 L780 140" class="arrow" />
+  <path d="M780 120 L780 90" class="arrow" />
+  <path d="M780 90 L700 90" class="arrow" />
+
+  <!-- Wavy connector replaced by explicit label -->
+  <text x="700" y="210" text-anchor="middle" class="note">Note: Do NOT introduce a new submission path</text>
+  <text x="700" y="226" text-anchor="middle" class="small">Dispatcher MUST call repository's canonical agent submission path</text>
+
+  <!-- Alternatives callout (moved out of primary flow) -->
+  <rect x="20" y="220" width="360" height="110" fill="#fff7f7" stroke="#b30000" rx="6" />
+  <text x="200" y="245" text-anchor="middle" class="note">Design alternatives (informational only)</text>
+  <text x="200" y="266" text-anchor="middle" class="small">1) manual mode — operator-driven</text>
+  <text x="200" y="286" text-anchor="middle" class="small">2) Agent Client Protocol (client/server)</text>
+  <text x="200" y="306" text-anchor="middle" class="small">3) OpenCode SDK (embed agent SDK)</text>
+  <text x="200" y="326" text-anchor="middle" class="small">These are design options; the canonical path above must be reused.</text>
+
+</svg>

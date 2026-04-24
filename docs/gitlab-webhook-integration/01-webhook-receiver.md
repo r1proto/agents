@@ -27,6 +27,8 @@ Implement a webhook receiver for GitLab issue events that:
 
 The receiver must be stateless — it should not persist any state itself.
 
+Note: The receiver must not call the agent submission path directly; it MUST forward parsed events to the dispatcher which is responsible for mapping, deduplication, and invoking the repository's canonical agent submission path. This keeps GitLab-specific logic out of the agent layer and preserves a single submission path.
+
 ## Acceptance Criteria
 
 - [ ] A POST to the webhook endpoint with a valid token and `issue` event payload returns `200 OK`

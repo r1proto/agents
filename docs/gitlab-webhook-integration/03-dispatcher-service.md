@@ -13,10 +13,13 @@ and integrate with it rather than creating a parallel mechanism.
 
 Implement a dispatcher service that:
 
-1. Accepts a parsed `GitLabIssueEvent` (from issue #2) as input.
-2. Constructs an internal task payload (from issue #4) from the event.
+1. Accepts a parsed `GitLabIssueEvent` (from issue #2) and the integration configuration
+   (from issue #5) as inputs.
+2. Constructs an internal task payload (from issue #4) from the event **and** the integration
+   config. The config supplies `target_repo_url` and `target_repo_ref` — the codebase the
+   agent will work in — which are separate from the GitLab source project fields in the event.
 3. Performs an idempotency check before submitting:
-   - Derive a deterministic deduplication key from `(project_id, issue_iid, action, timestamp)`.
+   - Derive a deterministic deduplication key from `(source_project_id, issue_iid, action, timestamp)`.
    - If the same event has already been submitted (within a reasonable window), skip submission
      and return a `duplicate` result without error.
 4. Calls the existing agent submission path with the task payload.

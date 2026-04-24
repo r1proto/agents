@@ -14,6 +14,11 @@ Implement a GitLab integration configuration that:
 1. Stores the following fields:
    - `base_url` — the GitLab instance base URL (e.g. `https://gitlab.company.internal`)
    - `webhook_secret` — the shared secret used to validate incoming webhook requests
+   - `target_repo_url` — the URL of the codebase repository the OpenCode AI Agent should clone
+     and work in when resolving issues (e.g. `https://github.com/org/backend`). This is distinct
+     from the GitLab project where issues are filed.
+   - `target_repo_ref` — optional default branch/ref for the agent to start from (defaults to
+     the repository's default branch when absent)
    - `enabled` — boolean flag to enable or disable the integration without removing config
    - `display_name` — optional human-readable label for the GitLab instance
 
@@ -37,6 +42,9 @@ to create or modify it.
 ## Acceptance Criteria
 
 - [ ] The configuration model exists with all fields listed above.
+- [ ] `target_repo_url` is required and must be a valid URL; reject empty or malformed values.
+- [ ] `target_repo_ref` is optional and defaults to empty string (agent uses the repo default
+      branch).
 - [ ] `base_url` validation rejects `http://`, empty strings, and non-URL values.
 - [ ] Trailing slashes in `base_url` are normalized on load.
 - [ ] `webhook_secret` is required and stored securely (not as plaintext in a config file).

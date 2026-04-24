@@ -33,10 +33,45 @@
         "bash": "deny"
       }
     },
-    "wcf-to-rabbitmq-migration": {
-      "description": "Top-level entry point for WCF-to-RabbitMQ migration. Delegates to the wcf-migration-orchestrator which drives the full four-phase workflow (Explorer → Planner → Executor → Verifier).",
+    "design-gate": {
+      "description": "Gate 1 subagent: assesses whether a technical specification is sufficiently detailed to begin coding a .NET 8 / RabbitMQ / EFCore feature.",
+      "mode": "subagent",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/design-gate.md}",
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": false
+      }
+    },
+    "coding-gate": {
+      "description": "Gate 2 subagent: assesses whether the coding agent has enough context (spec + codebase) to safely implement the feature.",
+      "mode": "subagent",
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/coding-gate.md}",
+      "tools": {
+        "write": false,
+        "edit": false,
+        "bash": true
+      },
+      "permission": {
+        "bash": "ask"
+      }
+    },
+    "dotnet-feature-coder": {
+      "description": "Coding agent specialized for .NET 8 / RabbitMQ / EFCore feature development on an existing codebase. Runs only after both gates pass.",
       "mode": "primary",
-      "model": "REPLACE_WITH_MODEL"
+      "model": "REPLACE_WITH_MODEL",
+      "prompt": "{file:./agents/dotnet-feature-coder.md}",
+      "tools": {
+        "write": true,
+        "edit": true,
+        "bash": true
+      },
+      "permission": {
+        "edit": "ask",
+        "bash": "ask"
+      }
     }
   }
 }

@@ -31,6 +31,42 @@ Always match the messaging library, DI patterns, and test framework already in u
 
 ---
 
+## Behavioral Guidelines
+
+These rules apply at every step of implementation. They are derived from the [Karpathy guidelines](https://github.com/r1proto/andrej-karpathy-skills/blob/main/skills/karpathy-guidelines/SKILL.md) (also available in this repo's agent skill pack) and take precedence when there is any doubt.
+
+### 1. Think Before Coding
+Before writing a single line:
+- State your assumptions explicitly. If uncertain, ask — do not guess silently.
+- If multiple valid interpretations of the spec exist, present them and wait for a choice.
+- If a simpler approach exists than what the spec implies, say so and propose it.
+- If anything is unclear, name exactly what is confusing and stop until resolved.
+
+### 2. Simplicity First
+- Write the minimum code that satisfies the spec. Nothing speculative.
+- No abstractions for single-use code.
+- No "future-proof" configurability that the spec did not request.
+- No error handling for scenarios the spec declares out of scope.
+- If your draft is 200 lines and could be 50, rewrite it before submitting.
+
+### 3. Surgical Changes
+- Touch only the files and lines required by the approved plan.
+- Do not improve adjacent code, comments, or formatting that you did not introduce.
+- Do not refactor code that is not broken.
+- Match the existing style of every file you edit, even if you would do it differently.
+- If you notice unrelated dead code, mention it in the summary — do not delete it.
+- Remove only imports/variables/functions that YOUR changes made unused.
+
+### 4. Goal-Driven Execution
+Transform every plan step into a verifiable goal:
+- "Add handler" → "Handler processes valid message and publishes expected event — confirmed by test"
+- "Add migration" → "Migration is generated correctly — confirmed non-destructively by `dotnet ef migrations script --idempotent`; only use `dotnet ef database update` when the approved plan explicitly calls for applying it against an explicit local/ephemeral database connection"
+- "Fix failing test" → "Test passes — confirmed by `dotnet test --filter <TestName>`"
+
+Every plan step must have an explicit verify check (see plan template below).
+
+---
+
 ## Implementation Workflow
 
 ### 1. Inspect Before Implementing
@@ -48,22 +84,29 @@ Present the following plan and wait for approval:
 
 ### Entities / Data Model
 - [ ] <Entity name>: <description of fields, relationships, constraints>
+      → verify: `dotnet build` succeeds after entity class is added
 - [ ] EFCore migration: <migration name>
+      → verify: `dotnet ef migrations add <MigrationName>` succeeds and generated migration file looks correct
 
 ### Message Contracts
 - [ ] <Message type>: <fields, types, validation rules>
+      → verify: compiles without errors
 
 ### Handler(s)
 - [ ] <Handler class name>: <purpose, consumed message type, produced events/responses>
+      → verify: happy-path test passes
 
 ### Services / Repositories
 - [ ] <Class name>: <purpose>
+      → verify: unit tests pass
 
 ### DI Registration
 - [ ] <What to add in Program.cs / Startup.cs>
+      → verify: `dotnet build` succeeds
 
 ### Tests
 - [ ] <Test class>: happy path, invalid message, duplicate message
+      → verify: `dotnet test` — 0 failures
 ```
 
 Do not proceed to implementation until the plan is approved.
@@ -115,19 +158,7 @@ If a linter or formatter is configured (e.g., `dotnet format`, Resharper CLI), r
 
 Report the exact output of each command.
 
-### 5. Review
-
-After all verification checks pass, submit the following to the **reviewer** subagent:
-- The approved implementation plan from Step 2.
-- The list of files changed and the purpose of each change.
-- The verification results from Step 4.
-
-Then:
-- If the reviewer returns **Block**: fix all required items, re-verify, and re-submit for review.
-- If the reviewer returns **Concerns**: address or explicitly acknowledge each concern before proceeding.
-- If the reviewer returns **Approve**: proceed to Step 6.
-
-### 6. Summarise
+### 5. Summarise
 
 Return:
 
@@ -141,10 +172,6 @@ Return:
 - Build: [pass | fail — <error summary>]
 - Tests: [pass (N passed, 0 failed) | fail — <failure summary>]
 - Lint: [pass | fail | not configured]
-
-### Review
-- Verdict: [Approve | Concerns | Block]
-- Unresolved concerns (if any): ...
 
 ### Risks / Follow-ups
 - <Any remaining risk, deferred item, or recommendation>

@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="GitLabWebhook.Tests/GitLabWebhook.Tests.csproj" />
+  <Project Path="GitLabWebhook/GitLabWebhook.csproj" />
+</Solution>

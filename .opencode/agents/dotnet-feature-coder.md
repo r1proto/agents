@@ -60,7 +60,7 @@ Before writing a single line:
 ### 4. Goal-Driven Execution
 Transform every plan step into a verifiable goal:
 - "Add handler" → "Handler processes valid message and publishes expected event — confirmed by test"
-- "Add migration" → "Migration applies cleanly — confirmed by `dotnet ef database update` (dry run)"
+- "Add migration" → "Migration is generated correctly — confirmed non-destructively by `dotnet ef migrations script --idempotent`; only use `dotnet ef database update` when the approved plan explicitly calls for applying it against an explicit local/ephemeral database connection"
 - "Fix failing test" → "Test passes — confirmed by `dotnet test --filter <TestName>`"
 
 Every plan step must have an explicit verify check (see plan template below).

@@ -20,7 +20,7 @@ Implement a webhook receiver for GitLab issue events that:
    Return `400 Bad Request` for malformed or unparseable payloads.
 4. Inspects the `X-Gitlab-Event` header (or equivalent event type field):
    - Forward `issue` events with action `open` or `update` to the dispatcher layer (issue #3).
-   - Return `200 OK` with a descriptive message for unsupported/ignored event types without
+   - Return `200 OK` for unsupported/ignored event types and silently ignore them without
      passing them downstream.
 5. Returns `200 OK` on successful forwarding to the dispatcher.
 6. Keeps all request-handling logic in the receiver; no business logic belongs here.

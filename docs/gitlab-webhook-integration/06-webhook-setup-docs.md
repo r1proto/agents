@@ -31,7 +31,7 @@ Create a documentation page (Markdown) targeting IT administrators. The document
 9. Save the webhook. Use **Test → Issues Events** to send a test payload.
 
 ### 4. Supported event types
-- `Issues events` — `opened` and `updated` actions are forwarded to the dispatcher.
+- `Issues events` — `open` and `update` actions are forwarded to the dispatcher.
 - All other GitLab event types are acknowledged (`200 OK`) and silently ignored.
 
 ### 5. Example GitLab issue webhook payload (abbreviated)

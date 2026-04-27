@@ -1,0 +1,5 @@
+Newtonsoft.Json 13.0.3
+MSTest.TestFramework 3.1.1
+MSTest.TestAdapter 3.1.1
+Microsoft.NET.Test.Sdk 17.8.0
+System.Configuration.ConfigurationManager 8.0.0

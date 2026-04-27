@@ -121,8 +121,15 @@ namespace GitLabWebhook.Parser
                 // Optional: description
                 evt.Description = payload.object_attributes.description ?? string.Empty;
 
-                // Optional: state (but usually present)
-                evt.State = payload.object_attributes.state ?? string.Empty;
+                // Required: state
+                if (string.IsNullOrWhiteSpace(payload.object_attributes.state))
+                {
+                    errors.Add(new ValidationError("object_attributes.state", "Issue state is required.", "VALIDATION_ERROR"));
+                }
+                else
+                {
+                    evt.State = payload.object_attributes.state;
+                }
 
                 // Parse timestamp (prefer updated_at, fall back to created_at)
                 string timestampStr = payload.object_attributes.updated_at ?? payload.object_attributes.created_at;

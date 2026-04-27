@@ -176,7 +176,7 @@ namespace GitLabWebhook.Tests
 
             // Assert
             Assert.IsTrue(result.Success, "Expected Success=true");
-            Assert.AreEqual(new DateTime(2024, 1, 15, 11, 30, 0, DateTimeKind.Utc), result.Event.Timestamp);
+            Assert.AreEqual(new DateTimeOffset(2024, 1, 15, 11, 30, 0, TimeSpan.Zero), result.Event.Timestamp);
         }
 
         [TestMethod]
@@ -207,7 +207,7 @@ namespace GitLabWebhook.Tests
 
             // Assert
             Assert.IsTrue(result.Success, "Expected Success=true");
-            Assert.AreEqual(new DateTime(2024, 1, 15, 10, 30, 0, DateTimeKind.Utc), result.Event.Timestamp);
+            Assert.AreEqual(new DateTimeOffset(2024, 1, 15, 10, 30, 0, TimeSpan.Zero), result.Event.Timestamp);
         }
 
         #endregion
@@ -517,6 +517,7 @@ namespace GitLabWebhook.Tests
                 ""object_attributes"": {
                     ""iid"": 456,
                     ""title"": ""Test Issue"",
+                    ""state"": ""opened"",
                     ""url"": ""https://gitlab.example.com/mygroup/myproject/-/issues/456"",
                     ""action"": ""open"",
                     ""created_at"": ""2024-01-15T10:30:00Z""
@@ -645,7 +646,7 @@ namespace GitLabWebhook.Tests
             CollectionAssert.Contains(evt.Assignees, "dev3");
 
             // Timestamp: object_attributes.updated_at (preferred) → Timestamp
-            Assert.AreEqual(new DateTime(2024, 1, 2, 12, 0, 0, DateTimeKind.Utc), evt.Timestamp);
+            Assert.AreEqual(new DateTimeOffset(2024, 1, 2, 12, 0, 0, TimeSpan.Zero), evt.Timestamp);
         }
 
         #endregion

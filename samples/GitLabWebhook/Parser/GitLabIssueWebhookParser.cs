@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 using GitLabWebhook.Models;
@@ -139,9 +140,11 @@ namespace GitLabWebhook.Parser
                 }
                 else
                 {
-                    if (DateTime.TryParse(timestampStr, out DateTime timestamp))
+                    if (DateTimeOffset.TryParse(timestampStr, CultureInfo.InvariantCulture,
+                        DateTimeStyles.RoundtripKind | DateTimeStyles.AssumeUniversal,
+                        out DateTimeOffset timestamp))
                     {
-                        evt.Timestamp = timestamp;
+                        evt.Timestamp = timestamp.ToUniversalTime();
                     }
                     else
                     {

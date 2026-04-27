@@ -84,11 +84,11 @@ namespace GitLabWebhook.Models
         public string Action { get; set; }
 
         /// <summary>
-        /// Timestamp of the event.
+        /// Timestamp of the event, always in UTC.
         /// Source: object_attributes.created_at or object_attributes.updated_at
         /// Required field.
         /// </summary>
-        public DateTime Timestamp { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
 
         public GitLabIssueWebhookEvent()
         {

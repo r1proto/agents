@@ -31,7 +31,7 @@ The main event model includes:
 | `State` | `string` | `object_attributes.state` | Yes |
 | `WebUrl` | `string` | `object_attributes.url` | Yes |
 | `Action` | `string` | `object_attributes.action` | Yes |
-| `Timestamp` | `DateTime` | `object_attributes.created_at` / `updated_at` | Yes |
+| `Timestamp` | `DateTimeOffset` | `object_attributes.created_at` / `updated_at` | Yes |
 
 ### ValidationError
 

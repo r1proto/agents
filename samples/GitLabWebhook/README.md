@@ -109,6 +109,7 @@ The parser validates that the following fields are present and non-empty:
 - Issue title
 - Web URL
 - Action/event type
+- State
 - Author username
 - Timestamp (either `created_at` or `updated_at`)
 
@@ -119,7 +120,6 @@ The following fields are optional and default to empty values when absent:
 - Description (defaults to empty string)
 - Labels (defaults to empty list)
 - Assignees (defaults to empty list)
-- State (defaults to empty string)
 
 ### Error Codes
 

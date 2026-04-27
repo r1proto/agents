@@ -119,12 +119,19 @@ Only reached if both gates pass.
    - Build the solution: `dotnet build`
    - Run the test suite: `dotnet test`
    - Run the linter / formatter if one is configured.
-   - If any check fails, fix the issue before reporting success.
+   - If any check fails, fix the issue before proceeding to review.
 
-5. **Summarise**: Report the following:
+5. **Review** (after verification passes):
+   - Submit the implementation summary (files changed, verification results) to the reviewer subagent.
+   - If the reviewer returns **Block**: fix all required items and re-verify before re-submitting for review.
+   - If the reviewer returns **Concerns**: address or explicitly acknowledge each concern, then proceed.
+   - If the reviewer returns **Approve**: proceed to the final summary.
+
+6. **Summarise**: Report the following:
    - Files changed and the purpose of each change.
    - Verification results (build, tests, lint).
-   - Any remaining risks or follow-up recommendations.
+   - Reviewer verdict and any unresolved concerns.
+   - Risks / follow-up recommendations.
 
 ---
 
@@ -158,6 +165,9 @@ Verification:
 - Build: [pass | fail]
 - Tests: [pass | fail | skipped]
 - Lint: [pass | fail | skipped]
+Review:
+- Verdict: [Approve | Concerns | Block]
+- Unresolved concerns (if any): ...
 Risks / follow-ups:
 - ...
 ```

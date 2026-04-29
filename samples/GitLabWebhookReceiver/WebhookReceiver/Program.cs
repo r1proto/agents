@@ -35,70 +35,45 @@ namespace GitLabWebhookReceiver.WebhookReceiver
             Console.WriteLine($"Webhook secret: {MaskSecret(secret)}");
             Console.WriteLine();
 
-            // Load integration configuration
-            var integrationConfig = WebhookConfig.GetIntegrationConfig();
-
             // Validate integration configuration
-            try
+            var validationError = WebhookConfig.ValidateConfig();
+            if (validationError != null)
             {
-                integrationConfig.Validate();
-                Console.WriteLine("[Program] GitLab integration configuration loaded:");
-                Console.WriteLine($"  Base URL: {integrationConfig.BaseUrl}");
-                Console.WriteLine($"  Target Repo: {integrationConfig.TargetRepoUrl}");
-                Console.WriteLine($"  Display Name: {integrationConfig.DisplayName}");
-                Console.WriteLine($"  Enabled: {integrationConfig.Enabled}");
-                Console.WriteLine();
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"[Program] ERROR: Invalid GitLab integration configuration: {ex.Message}");
-                Console.Error.WriteLine("[Program] The service will use the stub dispatcher (no agent submission).");
+                Console.Error.WriteLine($"WARNING: Configuration validation failed: {validationError}");
+                Console.Error.WriteLine("Using stub dispatcher. To enable full dispatcher, configure:");
+                Console.Error.WriteLine("  - GitLab:BaseUrl (https:// URL)");
+                Console.Error.WriteLine("  - GitLab:TargetRepoUrl (target repository URL)");
                 Console.WriteLine();
             }
 
             // Create dispatcher based on configuration
             IIssueEventDispatcher dispatcher;
-
-            if (integrationConfig.Enabled)
+            if (validationError == null && WebhookConfig.Enabled)
             {
-                try
+                // Use real dispatcher with agent submission
+                Console.WriteLine("Using GitLab dispatcher with agent submission");
+                Console.WriteLine($"GitLab instance: {WebhookConfig.DisplayName} ({WebhookConfig.GitLabBaseUrl})");
+                Console.WriteLine($"Target repo: {WebhookConfig.TargetRepoUrl}");
+                if (!string.IsNullOrEmpty(WebhookConfig.TargetRepoRef))
                 {
-                    // Load OpenCode configuration
-                    var openCodeExe = WebhookConfig.OpenCodeExecutable;
-                    var agentName = WebhookConfig.OpenCodeAgentName;
-                    var dedupWindowMinutes = WebhookConfig.DeduplicationWindowMinutes;
-
-                    Console.WriteLine("[Program] OpenCode agent configuration:");
-                    Console.WriteLine($"  Executable: {openCodeExe}");
-                    Console.WriteLine($"  Agent Name: {agentName}");
-                    Console.WriteLine($"  Deduplication Window: {dedupWindowMinutes} minutes");
-                    Console.WriteLine();
-
-                    // Create agent submission service
-                    var submissionService = new OpenCodeAgentSubmissionService(
-                        openCodeExe,
-                        agentName,
-                        dedupWindowMinutes);
-
-                    // Create production dispatcher with agent submission
-                    dispatcher = new AgentIssueEventDispatcher(submissionService, integrationConfig);
-
-                    Console.WriteLine("[Program] Using AgentIssueEventDispatcher with OpenCode integration");
+                    Console.WriteLine($"Target ref: {WebhookConfig.TargetRepoRef}");
                 }
-                catch (Exception ex)
-                {
-                    Console.Error.WriteLine($"[Program] ERROR: Failed to initialize agent dispatcher: {ex.Message}");
-                    Console.Error.WriteLine("[Program] Falling back to stub dispatcher.");
-                    dispatcher = new StubIssueEventDispatcher();
-                }
+                Console.WriteLine();
+
+                var agentSubmissionService = new StubAgentSubmissionService();
+                dispatcher = new GitLabIssueEventDispatcher(
+                    agentSubmissionService,
+                    WebhookConfig.GitLabBaseUrl,
+                    WebhookConfig.TargetRepoUrl,
+                    WebhookConfig.TargetRepoRef);
             }
             else
             {
-                Console.WriteLine("[Program] GitLab integration is disabled - using stub dispatcher");
+                // Use stub dispatcher (logs to console only)
+                Console.WriteLine("Using stub dispatcher (no agent submission)");
+                Console.WriteLine();
                 dispatcher = new StubIssueEventDispatcher();
             }
-
-            Console.WriteLine();
 
             // Create and start the webhook server
             var server = new WebhookServer(host, port, dispatcher, secret);

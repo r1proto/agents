@@ -34,8 +34,45 @@ namespace GitLabWebhookReceiver.WebhookReceiver
             Console.WriteLine($"Webhook secret: {MaskSecret(secret)}");
             Console.WriteLine();
 
-            // Create dispatcher (using stub implementation for now)
-            var dispatcher = new StubIssueEventDispatcher();
+            // Validate integration configuration
+            var validationError = WebhookConfig.ValidateConfig();
+            if (validationError != null)
+            {
+                Console.Error.WriteLine($"WARNING: Configuration validation failed: {validationError}");
+                Console.Error.WriteLine("Using stub dispatcher. To enable full dispatcher, configure:");
+                Console.Error.WriteLine("  - GitLab:BaseUrl (https:// URL)");
+                Console.Error.WriteLine("  - GitLab:TargetRepoUrl (target repository URL)");
+                Console.WriteLine();
+            }
+
+            // Create dispatcher based on configuration
+            IIssueEventDispatcher dispatcher;
+            if (validationError == null && WebhookConfig.Enabled)
+            {
+                // Use real dispatcher with agent submission
+                Console.WriteLine("Using GitLab dispatcher with agent submission");
+                Console.WriteLine($"GitLab instance: {WebhookConfig.DisplayName} ({WebhookConfig.GitLabBaseUrl})");
+                Console.WriteLine($"Target repo: {WebhookConfig.TargetRepoUrl}");
+                if (!string.IsNullOrEmpty(WebhookConfig.TargetRepoRef))
+                {
+                    Console.WriteLine($"Target ref: {WebhookConfig.TargetRepoRef}");
+                }
+                Console.WriteLine();
+
+                var agentSubmissionService = new StubAgentSubmissionService();
+                dispatcher = new GitLabIssueEventDispatcher(
+                    agentSubmissionService,
+                    WebhookConfig.GitLabBaseUrl,
+                    WebhookConfig.TargetRepoUrl,
+                    WebhookConfig.TargetRepoRef);
+            }
+            else
+            {
+                // Use stub dispatcher (logs to console only)
+                Console.WriteLine("Using stub dispatcher (no agent submission)");
+                Console.WriteLine();
+                dispatcher = new StubIssueEventDispatcher();
+            }
 
             // Create and start the webhook server
             var server = new WebhookServer(host, port, dispatcher, secret);

@@ -1,6 +1,7 @@
 using System;
 using GitLabWebhookReceiver.Config;
 using GitLabWebhookReceiver.Dispatcher;
+using GitLabWebhookReceiver.Submission;
 
 namespace GitLabWebhookReceiver.WebhookReceiver
 {

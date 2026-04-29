@@ -58,7 +58,7 @@ namespace GitLabWebhookReceiver.Models
         /// <summary>URL of the repository the agent should clone/check out and modify (required)</summary>
         public string TargetRepoUrl { get; set; }
 
-        /// <summary>Branch or ref the agent should start from (optional; empty string means default branch)</summary>
+        /// <summary>Branch or ref the agent should start from (required)</summary>
         public string TargetRepoRef { get; set; }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace GitLabWebhookReceiver.Models
         /// <param name="issueEvent">The GitLab issue event</param>
         /// <param name="instanceUrl">Base URL of the GitLab instance</param>
         /// <param name="targetRepoUrl">URL of the target repository for code changes</param>
-        /// <param name="targetRepoRef">Optional target branch/ref (defaults to empty string)</param>
+        /// <param name="targetRepoRef">Target branch/ref (required)</param>
         /// <returns>A populated AgentTask instance</returns>
         public static AgentTask FromGitLabIssueEvent(
             GitLabIssueEvent issueEvent,

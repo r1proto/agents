@@ -19,20 +19,33 @@ This implementation provides a webhook receiver for GitLab issue events that:
 GitLabWebhookReceiver/
 ├── Config/               # Configuration management
 │   ├── App.config       # Application configuration file
+│   ├── manifests.example.json # Example manifest configuration
 │   └── WebhookConfig.cs # Configuration helper class
-├── Dispatcher/          # Event dispatcher interface and stub implementation
-│   └── IIssueEventDispatcher.cs
-├── Models/              # GitLab webhook event models
-│   └── GitLabIssueEvent.cs
+├── Dispatcher/          # Event dispatcher interface and implementations
+│   ├── IIssueEventDispatcher.cs
+│   ├── GitLabIssueEventDispatcher.cs # App-config-based dispatcher (legacy)
+│   ├── ManifestDrivenGitLabDispatcher.cs # Manifest-based dispatcher (recommended)
+│   ├── IManifestRepository.cs
+│   ├── InMemoryManifestRepository.cs
+│   └── ManifestLoader.cs
+├── Models/              # GitLab webhook event models and manifest schema
+│   ├── GitLabIssueEvent.cs
+│   ├── AgentTask.cs
+│   └── GitLabGroupRepoManifest.cs
 ├── Tests/               # Unit and integration tests
 │   ├── GitLabWebhookReceiverTests.cs
-│   └── WebhookReceiverIntegrationTests.cs
+│   ├── WebhookReceiverIntegrationTests.cs
+│   ├── DispatcherTests.cs
+│   ├── ManifestTests.cs
+│   ├── ManifestDrivenDispatcherTests.cs
+│   └── ManifestLoaderTests.cs
 ├── WebhookReceiver/     # HTTP server and webhook handler
 │   ├── GitLabWebhookReceiver.cs
 │   ├── WebhookServer.cs
 │   └── Program.cs
 ├── packages.txt         # Required NuGet packages
-└── README.md           # This file
+├── README.md           # This file
+└── MANIFEST_IMPLEMENTATION.md # Manifest feature documentation
 ```
 
 ## Configuration
@@ -138,13 +151,49 @@ See `packages.txt` for the complete list of dependencies:
 
 ## Dispatcher Integration
 
-The webhook receiver forwards validated events to an `IIssueEventDispatcher` implementation. Currently, a `StubIssueEventDispatcher` is used that logs events to the console.
+The webhook receiver forwards validated events to an `IIssueEventDispatcher` implementation.
 
-To integrate with the actual dispatcher layer (issue r1proto/agents#3):
+### Manifest-Driven Dispatcher (Recommended)
 
-1. Implement the `IIssueEventDispatcher` interface
-2. Replace `StubIssueEventDispatcher` in `Program.cs` with your implementation
-3. The dispatcher will receive validated `GitLabIssueEvent` objects
+The `ManifestDrivenGitLabDispatcher` uses GitLab group repo manifests to route issues to different target repositories based on issue labels. This is the recommended approach for production deployments.
+
+**Key features:**
+- Label-based routing: Route issues to different repos based on labels
+- Flexible configuration: Update routing without code changes
+- Clear error messages: Explicit errors when no manifest matches
+- Validation: Ensures all manifests are valid on startup
+
+**Example setup:**
+
+```csharp
+// Load manifests from JSON file
+var manifests = ManifestLoader.LoadFromJsonFile("Config/manifests.json");
+var manifestRepo = new InMemoryManifestRepository(manifests);
+
+// Create manifest-driven dispatcher
+var agentService = new YourAgentSubmissionService();
+var dispatcher = new ManifestDrivenGitLabDispatcher(
+    agentService,
+    manifestRepo,
+    WebhookConfig.GitLabBaseUrl);
+```
+
+See [MANIFEST_IMPLEMENTATION.md](MANIFEST_IMPLEMENTATION.md) for complete documentation.
+
+### App-Config-Based Dispatcher (Legacy)
+
+The `GitLabIssueEventDispatcher` uses a single target repository URL from App.config. This is the legacy approach and is maintained for backward compatibility.
+
+**Example setup:**
+
+```csharp
+var agentService = new YourAgentSubmissionService();
+var dispatcher = new GitLabIssueEventDispatcher(
+    agentService,
+    WebhookConfig.GitLabBaseUrl,
+    WebhookConfig.TargetRepoUrl,
+    WebhookConfig.TargetRepoRef);
+```
 
 ## Design Decisions
 
@@ -193,6 +242,12 @@ This implementation follows the existing patterns found in the `RabbitMqOrderSer
 - Add structured logging (e.g., using Serilog)
 - Add support for async/await patterns
 - Add support for other GitLab webhook event types
+- **Manifest enhancements:**
+  - Dynamic manifest loading from GitLab API or database
+  - Priority/ordering when multiple labels match
+  - Pattern matching with wildcards or regex in issue tags
+  - Distributed caching for manifest lookups
+  - Metrics for manifest usage tracking
 
 ## Related Issues
 

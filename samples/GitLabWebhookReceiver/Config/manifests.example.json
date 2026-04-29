@@ -1,0 +1,26 @@
+[
+  {
+    "GitLabIssueTag": "backend",
+    "GitLabTargetRepoUrl": "https://github.com/example-org/backend-service",
+    "CodeRepositoryPath": "example-org/backend-service",
+    "TargetRepoRef": "main"
+  },
+  {
+    "GitLabIssueTag": "frontend",
+    "GitLabTargetRepoUrl": "https://github.com/example-org/frontend-app",
+    "CodeRepositoryPath": "example-org/frontend-app",
+    "TargetRepoRef": "develop"
+  },
+  {
+    "GitLabIssueTag": "infrastructure",
+    "GitLabTargetRepoUrl": "https://github.com/example-org/infra-terraform",
+    "CodeRepositoryPath": "example-org/infra-terraform",
+    "TargetRepoRef": ""
+  },
+  {
+    "GitLabIssueTag": "mobile",
+    "GitLabTargetRepoUrl": "https://github.com/example-org/mobile-app",
+    "CodeRepositoryPath": "example-org/mobile-app",
+    "TargetRepoRef": "main"
+  }
+]
